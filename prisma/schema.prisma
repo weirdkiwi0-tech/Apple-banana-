@@ -1,7 +1,9 @@
 // Prisma schema — docs/ARCHITECTURE.md 데이터 모델과 TRD §5 무결성 규칙을 반영한다.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Vercel 서버리스 런타임(Amazon Linux/OpenSSL 3.0)용 엔진을 반드시 생성하도록 명시
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
