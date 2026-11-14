@@ -26,82 +26,78 @@ export function ImportsForm() {
             }
           });
         }}
-        className="rounded-md border bg-white p-4 shadow-sm"
+        className="ui-card p-4 sm:p-5"
       >
-        <label className="block text-sm font-medium text-slate-800">
+        <label className="block text-sm font-bold text-slate-900">
           Excel 파일 (.xlsx)
         </label>
-        <p className="mt-1 text-xs text-slate-500">
-          단순 양식 열: 학번, 이름, 반, 날짜(YYYY-MM-DD), 구분(오자/야자/심자)
-        </p>
-        <p className="mt-0.5 text-xs text-slate-500">
-          또는 설문 원본(제출내역/제출내역_텍스트)을 그대로 업로드할 수 있습니다. 기준 월요일을 비우면 이번 주 월요일로 자동 적용됩니다.
-        </p>
-        <p className="mt-0.5 text-xs text-slate-500">
-          내려받은 주간 출결표에 표시(출·지·조·결·인)를 채워 다시 올리면 그 출결이 주간 출결표에 그대로 반영됩니다.
-        </p>
+        <div className="mt-1.5 space-y-1 rounded-xl bg-slate-50/90 p-3 text-xs text-slate-600">
+          <p>• 단순 양식 열: 학번, 이름, 반, 날짜(YYYY-MM-DD), 구분(오자/야자/심자)</p>
+          <p>• 설문 원본(제출내역/제출내역_텍스트)을 그대로 업로드 가능 (기준 월요일 생략 시 이번 주 월요일 자동 적용)</p>
+          <p>• 내려받은 주간 출결표에 표시(출·지·조·결·인)를 채워 다시 올리면 주간 출결표에 그대로 반영</p>
+        </div>
         <input
           type="file"
           name="file"
           accept=".xlsx,.xls"
           required
-          className="mt-2 block w-full min-h-[40px] text-sm file:mr-3 file:min-h-[36px] file:rounded file:border-0 file:bg-slate-900 file:px-3 file:text-white"
+          className="mt-3 block w-full min-h-[42px] rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-1.5 text-sm file:mr-3 file:min-h-[36px] file:rounded-lg file:border-0 file:bg-slate-900 file:px-3.5 file:text-xs file:font-semibold file:text-white"
         />
-        <label className="mt-3 block text-sm font-medium text-slate-800">
-          기준 월요일 <span className="font-normal text-slate-500">(설문 업로드 시, 비우면 이번 주 자동)</span>
+        <label className="mt-3.5 block text-sm font-bold text-slate-900">
+          기준 월요일 <span className="text-xs font-normal text-slate-500">(설문 업로드 시, 비우면 이번 주 자동)</span>
         </label>
         <input
           type="date"
           name="weekMonday"
-          className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 text-sm sm:w-auto"
+          className="ui-input mt-1.5 block w-full sm:w-auto"
         />
         <button
           type="submit"
           disabled={isPending}
-          className="mt-3 min-h-[40px] w-full rounded bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50 sm:w-auto"
+          className="ui-btn mt-4 w-full bg-gradient-to-r from-slate-900 to-indigo-950 px-5 py-2.5 font-semibold text-white shadow-sm sm:w-auto"
         >
           {isPending ? "업로드 중..." : "업로드"}
         </button>
         {error && (
-          <p className="mt-2 text-sm text-red-600">{error}</p>
+          <p className="mt-2.5 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
       </form>
 
       {result && result.ok && (
-        <div className="rounded-md border bg-white p-4 shadow-sm">
-          <h3 className="text-sm font-semibold">업로드 결과</h3>
-          <dl className="mt-2 grid grid-cols-2 gap-2 text-sm text-slate-700 sm:grid-cols-3 lg:grid-cols-8">
-            <div>
-              <dt className="text-slate-500">전체 행</dt>
-              <dd className="font-medium">{result.totalRows}</dd>
+        <div className="ui-card p-4 sm:p-5">
+          <h3 className="text-sm font-bold text-slate-900">업로드 결과</h3>
+          <dl className="mt-3 grid grid-cols-2 gap-2 text-sm text-slate-700 sm:grid-cols-4 lg:grid-cols-8">
+            <div className="rounded-xl bg-slate-50 p-2.5">
+              <dt className="text-xs text-slate-500">전체 행</dt>
+              <dd className="mt-0.5 text-base font-bold">{result.totalRows}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">유효 행</dt>
-              <dd className="font-medium">{result.validRows}</dd>
+            <div className="rounded-xl bg-slate-50 p-2.5">
+              <dt className="text-xs text-slate-500">유효 행</dt>
+              <dd className="mt-0.5 text-base font-bold">{result.validRows}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">신규 생성</dt>
-              <dd className="font-medium text-emerald-700">{result.createdRows}</dd>
+            <div className="rounded-xl bg-emerald-50/70 p-2.5">
+              <dt className="text-xs text-emerald-700">신규 생성</dt>
+              <dd className="mt-0.5 text-base font-bold text-emerald-700">{result.createdRows}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">기존 갱신</dt>
-              <dd className="font-medium text-sky-700">{result.updatedRows}</dd>
+            <div className="rounded-xl bg-sky-50/70 p-2.5">
+              <dt className="text-xs text-sky-700">기존 갱신</dt>
+              <dd className="mt-0.5 text-base font-bold text-sky-700">{result.updatedRows}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">이전 제거</dt>
-              <dd className="font-medium text-red-700">{result.removedRows}</dd>
+            <div className="rounded-xl bg-red-50/70 p-2.5">
+              <dt className="text-xs text-red-700">이전 제거</dt>
+              <dd className="mt-0.5 text-base font-bold text-red-700">{result.removedRows}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">기존 유지</dt>
-              <dd className="font-medium">{result.existingSkipped}</dd>
+            <div className="rounded-xl bg-slate-50 p-2.5">
+              <dt className="text-xs text-slate-500">기존 유지</dt>
+              <dd className="mt-0.5 text-base font-bold">{result.existingSkipped}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">중복 행</dt>
-              <dd className="font-medium">{result.duplicateRows}</dd>
+            <div className="rounded-xl bg-slate-50 p-2.5">
+              <dt className="text-xs text-slate-500">중복 행</dt>
+              <dd className="mt-0.5 text-base font-bold">{result.duplicateRows}</dd>
             </div>
-            <div>
-              <dt className="text-slate-500">캘린더 제외</dt>
-              <dd className="font-medium">{result.excludedByCalendar}</dd>
+            <div className="rounded-xl bg-slate-50 p-2.5">
+              <dt className="text-xs text-slate-500">캘린더 제외</dt>
+              <dd className="mt-0.5 text-base font-bold">{result.excludedByCalendar}</dd>
             </div>
           </dl>
 

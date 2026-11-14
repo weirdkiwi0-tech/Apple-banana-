@@ -31,10 +31,14 @@ export default async function SlotsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">슬롯 설정</h1>
-      <p className="text-sm text-slate-600">
-        슬롯별 시작·종료 시간과 지각 기준(분)을 설정합니다. 지각 기준을 비우면 지각 자동 판정이 비활성화되고 입실은 항상 출석으로 기록됩니다.
-      </p>
+      <div className="ui-card p-4">
+        <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+          슬롯 설정
+        </h1>
+        <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+          슬롯별 시작·종료 시간과 지각 기준(분)을 설정합니다. 지각 기준을 비우면 지각 자동 판정이 비활성화되고 입실은 항상 출석으로 기록됩니다.
+        </p>
+      </div>
       <SlotEditor slots={slots} />
     </div>
   );

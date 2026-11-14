@@ -54,80 +54,105 @@ export default async function LogsPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">운영 기록</h1>
+      <div className="ui-card p-4">
+        <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+          운영 기록
+        </h1>
         <p className="mt-0.5 text-xs text-slate-500">
           명부 업로드 이력과 출결·설정 변경 이력을 확인합니다. 이 화면은 조회 전용입니다.
         </p>
       </div>
 
       {/* 업로드 이력 */}
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-slate-800">업로드 이력</h2>
+      <section className="space-y-2.5">
+        <h2 className="px-1 text-sm font-bold text-slate-800">업로드 이력</h2>
         {batches.length === 0 ? (
-          <p className="rounded-md border bg-white p-4 text-sm text-slate-500 shadow-sm">
+          <p className="ui-card p-4 text-sm text-slate-500">
             업로드 이력이 없습니다.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-md border bg-white shadow-sm">
-            <table className="w-full min-w-[560px] text-sm">
-              <thead className="border-b bg-slate-50 text-left text-xs text-slate-600">
-                <tr>
-                  <th className="px-3 py-2">업로드 시각</th>
-                  <th className="px-3 py-2">파일명</th>
-                  <th className="px-3 py-2 text-right">행 수</th>
-                  <th className="px-3 py-2 text-right">오류 수</th>
-                  <th className="px-3 py-2">작업자</th>
-                </tr>
-              </thead>
-              <tbody>
-                {batches.map((b) => (
-                  <tr key={b.id} className="border-b last:border-0">
-                    <td className="whitespace-nowrap px-3 py-2 text-slate-700">{formatAt(b.importedAt)}</td>
-                    <td className="px-3 py-2 text-slate-700">{b.fileName}</td>
-                    <td className="px-3 py-2 text-right text-slate-700">{b.rowCount}</td>
-                    <td className={`px-3 py-2 text-right ${b.errorCount > 0 ? "font-medium text-red-700" : "text-slate-700"}`}>
-                      {b.errorCount}
-                    </td>
-                    <td className="px-3 py-2 text-slate-700">{b.actor}</td>
+          <>
+            {/* 모바일 카드 */}
+            <ul className="space-y-2 sm:hidden">
+              {batches.map((b) => (
+                <li key={b.id} className="ui-card p-3.5 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate font-semibold text-slate-900">{b.fileName}</span>
+                    <span className="shrink-0 font-mono text-[11px] text-slate-400">
+                      {formatAt(b.importedAt)}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-3 text-slate-600">
+                    <span>행 수 <strong>{b.rowCount}</strong></span>
+                    <span className={b.errorCount > 0 ? "font-semibold text-red-600" : ""}>
+                      오류 {b.errorCount}
+                    </span>
+                    <span className="ml-auto text-slate-400">{b.actor}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="ui-card hidden overflow-x-auto sm:block">
+              <table className="w-full min-w-[560px] text-sm">
+                <thead className="border-b bg-slate-50/90 text-left text-xs text-slate-600">
+                  <tr>
+                    <th className="px-3.5 py-2.5">업로드 시각</th>
+                    <th className="px-3.5 py-2.5">파일명</th>
+                    <th className="px-3.5 py-2.5 text-right">행 수</th>
+                    <th className="px-3.5 py-2.5 text-right">오류 수</th>
+                    <th className="px-3.5 py-2.5">작업자</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {batches.map((b) => (
+                    <tr key={b.id} className="border-b last:border-0 hover:bg-slate-50/60">
+                      <td className="whitespace-nowrap px-3.5 py-2.5 text-slate-700">{formatAt(b.importedAt)}</td>
+                      <td className="px-3.5 py-2.5 text-slate-700">{b.fileName}</td>
+                      <td className="px-3.5 py-2.5 text-right text-slate-700">{b.rowCount}</td>
+                      <td className={`px-3.5 py-2.5 text-right ${b.errorCount > 0 ? "font-medium text-red-700" : "text-slate-700"}`}>
+                        {b.errorCount}
+                      </td>
+                      <td className="px-3.5 py-2.5 text-slate-700">{b.actor}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 
       {/* 활동 로그 */}
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-slate-800">활동 로그</h2>
+      <section className="space-y-2.5">
+        <h2 className="px-1 text-sm font-bold text-slate-800">활동 로그</h2>
 
-        <form className="rounded-md border bg-white p-4 shadow-sm" method="get">
+        <form className="ui-card p-4" method="get">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-            <label className="text-sm">
+            <label className="text-xs font-semibold text-slate-700 sm:text-sm">
               시작일
               <input
                 name="from"
                 type="date"
                 defaultValue={from ?? ""}
-                className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 py-1"
+                className="ui-input mt-1 block w-full"
               />
             </label>
-            <label className="text-sm">
+            <label className="text-xs font-semibold text-slate-700 sm:text-sm">
               종료일
               <input
                 name="to"
                 type="date"
                 defaultValue={to ?? ""}
-                className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 py-1"
+                className="ui-input mt-1 block w-full"
               />
             </label>
-            <label className="text-sm">
+            <label className="text-xs font-semibold text-slate-700 sm:text-sm">
               액션
               <select
                 name="action"
                 defaultValue={action ?? ""}
-                className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 py-1"
+                className="ui-input mt-1 block w-full"
               >
                 <option value="">전체</option>
                 {AUDIT_ACTION_ORDER.map((a) => (
@@ -140,49 +165,74 @@ export default async function LogsPage({
             <div className="flex items-end">
               <button
                 type="submit"
-                className="w-full min-h-[40px] rounded bg-slate-900 px-3 py-1.5 text-sm text-white"
+                className="ui-btn w-full bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
               >
                 적용
               </button>
             </div>
           </div>
-          <p className="mt-2 text-xs text-slate-500">전체 {logs.total}건 · {logs.page}/{logs.totalPages} 페이지</p>
+          <p className="mt-2.5 text-xs text-slate-500">전체 {logs.total}건 · {logs.page}/{logs.totalPages} 페이지</p>
         </form>
 
         {logs.rows.length === 0 ? (
-          <p className="rounded-md border bg-white p-4 text-sm text-slate-500 shadow-sm">
+          <p className="ui-card p-4 text-sm text-slate-500">
             해당 조건의 활동 로그가 없습니다.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-md border bg-white shadow-sm">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead className="border-b bg-slate-50 text-left text-xs text-slate-600">
-                <tr>
-                  <th className="px-3 py-2">시각</th>
-                  <th className="px-3 py-2">작업자</th>
-                  <th className="px-3 py-2">액션</th>
-                  <th className="px-3 py-2">대상</th>
-                  <th className="px-3 py-2">요약</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.rows.map((log) => (
-                  <tr key={log.id} className="border-b last:border-0 align-top">
-                    <td className="whitespace-nowrap px-3 py-2 text-slate-700">{formatAt(log.at)}</td>
-                    <td className="px-3 py-2 text-slate-700">{log.actor}</td>
-                    <td className="px-3 py-2 text-slate-800">{auditActionLabel(log.action)}</td>
-                    <td className="px-3 py-2 text-slate-600">
-                      <span className="text-slate-800">{auditTargetLabel(log.targetType)}</span>
-                      <span className="ml-1 block max-w-[10rem] truncate text-xs text-slate-400" title={log.targetId}>
-                        {log.targetId}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-slate-700">{summarizeAuditMeta(log.action, log.meta)}</td>
+          <>
+            {/* 모바일 카드 */}
+            <ul className="space-y-2 sm:hidden">
+              {logs.rows.map((log) => (
+                <li key={log.id} className="ui-card p-3.5 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-lg bg-slate-100 px-2 py-0.5 font-semibold text-slate-800">
+                      {auditActionLabel(log.action)}
+                    </span>
+                    <span className="font-mono text-[11px] text-slate-400">
+                      {formatAt(log.at)}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-slate-700">
+                    {summarizeAuditMeta(log.action, log.meta)}
+                  </p>
+                  <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>{auditTargetLabel(log.targetType)}</span>
+                    <span>{log.actor}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="ui-card hidden overflow-x-auto sm:block">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead className="border-b bg-slate-50/90 text-left text-xs text-slate-600">
+                  <tr>
+                    <th className="px-3.5 py-2.5">시각</th>
+                    <th className="px-3.5 py-2.5">작업자</th>
+                    <th className="px-3.5 py-2.5">액션</th>
+                    <th className="px-3.5 py-2.5">대상</th>
+                    <th className="px-3.5 py-2.5">요약</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {logs.rows.map((log) => (
+                    <tr key={log.id} className="border-b last:border-0 align-top hover:bg-slate-50/60">
+                      <td className="whitespace-nowrap px-3.5 py-2.5 text-slate-700">{formatAt(log.at)}</td>
+                      <td className="px-3.5 py-2.5 text-slate-700">{log.actor}</td>
+                      <td className="px-3.5 py-2.5 text-slate-800">{auditActionLabel(log.action)}</td>
+                      <td className="px-3.5 py-2.5 text-slate-600">
+                        <span className="text-slate-800">{auditTargetLabel(log.targetType)}</span>
+                        <span className="ml-1 block max-w-[10rem] truncate text-xs text-slate-400" title={log.targetId}>
+                          {log.targetId}
+                        </span>
+                      </td>
+                      <td className="px-3.5 py-2.5 text-slate-700">{summarizeAuditMeta(log.action, log.meta)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {logs.totalPages > 1 && (
@@ -190,25 +240,25 @@ export default async function LogsPage({
             {logs.page > 1 ? (
               <Link
                 href={pageLink(logs.page - 1)}
-                className="min-h-[40px] rounded border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
+                className="ui-btn border border-slate-200 bg-white px-3.5 py-1.5 hover:bg-slate-50"
               >
                 이전
               </Link>
             ) : (
-              <span className="min-h-[40px] rounded border border-slate-200 px-3 py-1.5 text-slate-300">이전</span>
+              <span className="ui-btn border border-slate-100 bg-white/50 px-3.5 py-1.5 text-slate-300">이전</span>
             )}
-            <span className="text-slate-500">
+            <span className="text-xs font-medium text-slate-500">
               {logs.page} / {logs.totalPages}
             </span>
             {logs.page < logs.totalPages ? (
               <Link
                 href={pageLink(logs.page + 1)}
-                className="min-h-[40px] rounded border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
+                className="ui-btn border border-slate-200 bg-white px-3.5 py-1.5 hover:bg-slate-50"
               >
                 다음
               </Link>
             ) : (
-              <span className="min-h-[40px] rounded border border-slate-200 px-3 py-1.5 text-slate-300">다음</span>
+              <span className="ui-btn border border-slate-100 bg-white/50 px-3.5 py-1.5 text-slate-300">다음</span>
             )}
           </div>
         )}

@@ -57,11 +57,11 @@ function ActionButtons({
   startTransition,
 }: ActionButtonsProps) {
   const base =
-    "min-h-[36px] rounded px-2.5 text-xs font-medium text-white disabled:opacity-50";
+    "min-h-[40px] rounded-xl px-3 text-xs font-semibold text-white shadow-sm transition active:scale-95 disabled:opacity-45 sm:min-h-[36px] sm:px-2.5";
   const canCheckOut =
     row.state === "PRESENT" || row.state === "LATE" || row.state === "LEAVE_EARLY";
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="grid grid-cols-5 gap-1.5 sm:flex sm:flex-wrap sm:gap-1.5">
       <button
         type="button"
         disabled={pending}
@@ -70,7 +70,7 @@ function ActionButtons({
             checkInAction({ planId: row.planId, date, slot }),
           )
         }
-        className={`${base} bg-emerald-600`}
+        className={`${base} bg-emerald-600 hover:bg-emerald-700`}
       >
         입실
       </button>
@@ -83,7 +83,7 @@ function ActionButtons({
             await checkOutAction({ planId: row.planId, date, slot });
           })
         }
-        className={`${base} bg-orange-600`}
+        className={`${base} bg-orange-600 hover:bg-orange-700`}
       >
         퇴실
       </button>
@@ -91,7 +91,7 @@ function ActionButtons({
         type="button"
         disabled={pending}
         onClick={() => onOpenAbsence(row)}
-        className={`${base} bg-red-600`}
+        className={`${base} bg-red-600 hover:bg-red-700`}
       >
         불참
       </button>
@@ -101,7 +101,7 @@ function ActionButtons({
         onClick={() =>
           startTransition(() => markExcusedAction({ planId: row.planId }))
         }
-        className={`${base} bg-sky-600`}
+        className={`${base} bg-sky-600 hover:bg-sky-700`}
       >
         인정
       </button>
@@ -111,7 +111,7 @@ function ActionButtons({
         onClick={() =>
           startTransition(() => resetAction({ planId: row.planId }))
         }
-        className="min-h-[36px] rounded border border-slate-300 px-2.5 text-xs font-medium text-slate-700 disabled:opacity-50"
+        className="min-h-[40px] rounded-xl border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50 active:scale-95 disabled:opacity-45 sm:min-h-[36px] sm:px-2.5"
       >
         초기화
       </button>
@@ -123,10 +123,11 @@ export function AttendanceTable({ date, slot, rows }: Props) {
   const [pending, startTransition] = useTransition();
   const [absenceFor, setAbsenceFor] = useState<AttendanceRow | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
+  const [query, setQuery] = useState("");
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-md border bg-white p-4 text-sm text-slate-600 shadow-sm">
+      <div className="ui-card p-5 text-sm text-slate-600">
         해당 날짜·슬롯({SLOT_LABEL[slot]})의 대상자가 없습니다. 명부 업로드 화면에서 Excel을 업로드하세요.
       </div>
     );
@@ -137,23 +138,60 @@ export function AttendanceTable({ date, slot, rows }: Props) {
     setNoteDraft(row.absenceNote ?? "");
   };
 
+  const trimmed = query.trim().toLowerCase();
+  const filteredRows = trimmed
+    ? rows.filter(
+        (r) =>
+          r.name.toLowerCase().includes(trimmed) ||
+          r.studentNo.toLowerCase().includes(trimmed) ||
+          r.classroom.toLowerCase().includes(trimmed),
+      )
+    : rows;
+
   return (
     <div className="space-y-3">
-      {/* 모바일: 카드 리스트 */}
-      <ul className="space-y-2 sm:hidden">
-        {rows.map((row) => (
+      {/* 빠른 검색 바 */}
+      <div className="ui-card flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="이름·학번·반 빠른 검색..."
+          aria-label="출결 학생 검색"
+          className="ui-input w-full sm:max-w-xs"
+        />
+        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+          <span>전체 {rows.length}명</span>
+          <span>·</span>
+          <span className="text-emerald-700 font-medium">
+            출석 {rows.filter((r) => r.state === "PRESENT").length}
+          </span>
+          <span>·</span>
+          <span className="text-red-700 font-medium">
+            결석 {rows.filter((r) => r.state === "ABSENT").length}
+          </span>
+          <span>·</span>
+          <span>
+            미체크 {rows.filter((r) => r.state === "UNCHECKED").length}
+          </span>
+        </div>
+      </div>
+
+      {/* 모바일: 카드 기반 디자인 (Card-based Design) */}
+      <ul className="space-y-2.5 sm:hidden">
+        {filteredRows.map((row) => (
           <li
             key={row.planId}
-            className="rounded-md border bg-white p-3 shadow-sm"
+            className="ui-card p-3.5"
           >
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium text-slate-900">
+                  <span className="text-sm font-bold text-slate-900">
                     {row.name}
                   </span>
                   <span
-                    className={`inline-block rounded px-2 py-0.5 text-[11px] font-medium ${STATE_STYLE[row.state]}`}
+                    className={`inline-block rounded-lg px-2 py-0.5 text-[11px] font-semibold ${STATE_STYLE[row.state]}`}
                   >
                     {STATE_LABEL[row.state]}
                   </span>
@@ -164,17 +202,17 @@ export function AttendanceTable({ date, slot, rows }: Props) {
                   <span>{row.classroom}</span>
                 </div>
               </div>
-              <div className="text-right text-xs text-slate-600">
+              <div className="rounded-lg bg-slate-50 px-2 py-1 text-right text-[11px] text-slate-600">
                 <div>
-                  입실 {row.checkInAt ? formatKstTime(new Date(row.checkInAt)) : "-"}
+                  입실 <span className="font-mono">{row.checkInAt ? formatKstTime(new Date(row.checkInAt)) : "-"}</span>
                 </div>
                 <div>
-                  퇴실 {row.checkOutAt ? formatKstTime(new Date(row.checkOutAt)) : "-"}
+                  퇴실 <span className="font-mono">{row.checkOutAt ? formatKstTime(new Date(row.checkOutAt)) : "-"}</span>
                 </div>
               </div>
             </div>
             {row.absenceNote && (
-              <p className="mt-2 rounded bg-red-50 px-2 py-1 text-xs text-red-800">
+              <p className="mt-2 rounded-xl bg-red-50/90 px-2.5 py-1.5 text-xs text-red-800">
                 사유: {row.absenceNote}
               </p>
             )}
@@ -192,46 +230,46 @@ export function AttendanceTable({ date, slot, rows }: Props) {
         ))}
       </ul>
 
-      {/* 데스크톱: 테이블 (기존 디자인 유지) */}
-      <div className="hidden overflow-x-auto rounded-md border bg-white shadow-sm sm:block">
+      {/* 데스크톱: 테이블 */}
+      <div className="ui-card hidden overflow-x-auto sm:block">
         <table className="w-full text-sm">
-          <thead className="border-b bg-slate-50 text-left text-xs text-slate-600">
+          <thead className="border-b bg-slate-50/90 text-left text-xs text-slate-600">
             <tr>
-              <th className="px-3 py-2">학번</th>
-              <th className="px-3 py-2">이름</th>
-              <th className="px-3 py-2">반</th>
-              <th className="px-3 py-2">상태</th>
-              <th className="px-3 py-2">입실</th>
-              <th className="px-3 py-2">퇴실</th>
-              <th className="px-3 py-2">사유</th>
-              <th className="px-3 py-2 text-right">액션</th>
+              <th className="px-3.5 py-2.5">학번</th>
+              <th className="px-3.5 py-2.5">이름</th>
+              <th className="px-3.5 py-2.5">반</th>
+              <th className="px-3.5 py-2.5">상태</th>
+              <th className="px-3.5 py-2.5">입실</th>
+              <th className="px-3.5 py-2.5">퇴실</th>
+              <th className="px-3.5 py-2.5">사유</th>
+              <th className="px-3.5 py-2.5 text-right">액션</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.planId} className="border-b last:border-b-0">
-                <td className="px-3 py-2 font-mono text-xs text-slate-700">
+            {filteredRows.map((row) => (
+              <tr key={row.planId} className="border-b last:border-b-0 hover:bg-slate-50/60">
+                <td className="px-3.5 py-2.5 font-mono text-xs text-slate-700">
                   {row.studentNo}
                 </td>
-                <td className="px-3 py-2">{row.name}</td>
-                <td className="px-3 py-2 text-slate-600">{row.classroom}</td>
-                <td className="px-3 py-2">
+                <td className="px-3.5 py-2.5 font-medium text-slate-900">{row.name}</td>
+                <td className="px-3.5 py-2.5 text-slate-600">{row.classroom}</td>
+                <td className="px-3.5 py-2.5">
                   <span
-                    className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${STATE_STYLE[row.state]}`}
+                    className={`inline-block rounded-lg px-2 py-0.5 text-xs font-semibold ${STATE_STYLE[row.state]}`}
                   >
                     {STATE_LABEL[row.state]}
                   </span>
                 </td>
-                <td className="px-3 py-2 text-xs text-slate-600">
+                <td className="px-3.5 py-2.5 font-mono text-xs text-slate-600">
                   {row.checkInAt ? formatKstTime(new Date(row.checkInAt)) : "-"}
                 </td>
-                <td className="px-3 py-2 text-xs text-slate-600">
+                <td className="px-3.5 py-2.5 font-mono text-xs text-slate-600">
                   {row.checkOutAt ? formatKstTime(new Date(row.checkOutAt)) : "-"}
                 </td>
-                <td className="px-3 py-2 text-xs text-slate-600">
+                <td className="px-3.5 py-2.5 text-xs text-slate-600">
                   {row.absenceNote ?? "-"}
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-3.5 py-2.5">
                   <div className="flex justify-end">
                     <ActionButtons
                       row={row}
@@ -250,8 +288,8 @@ export function AttendanceTable({ date, slot, rows }: Props) {
       </div>
 
       {absenceFor && (
-        <div className="sticky bottom-[max(0.75rem,env(safe-area-inset-bottom))] rounded-md border bg-white p-4 shadow-lg">
-          <h3 className="text-sm font-semibold">
+        <div className="ui-glass sticky bottom-[max(4.25rem,calc(env(safe-area-inset-bottom)+3.75rem))] z-20 rounded-2xl border p-4 shadow-xl sm:bottom-4">
+          <h3 className="text-sm font-bold text-slate-900">
             불참 사유 입력 — {absenceFor.name} ({absenceFor.studentNo})
           </h3>
           <p className="mt-1 text-xs text-red-600">
@@ -262,10 +300,10 @@ export function AttendanceTable({ date, slot, rows }: Props) {
             onChange={(e) => setNoteDraft(e.target.value.slice(0, 200))}
             rows={3}
             maxLength={200}
-            className="mt-2 w-full rounded border border-slate-300 p-2 text-sm"
+            className="ui-input mt-2 w-full"
             placeholder="사유 (최대 200자)"
           />
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
             <span>{noteDraft.length}/200</span>
             <div className="flex flex-wrap gap-2">
               <button
@@ -274,7 +312,7 @@ export function AttendanceTable({ date, slot, rows }: Props) {
                   setAbsenceFor(null);
                   setNoteDraft("");
                 }}
-                className="min-h-[36px] rounded border border-slate-300 px-3 text-slate-700"
+                className="ui-btn border border-slate-300 bg-white px-3 text-xs text-slate-700"
               >
                 취소
               </button>
@@ -290,7 +328,7 @@ export function AttendanceTable({ date, slot, rows }: Props) {
                     setNoteDraft("");
                   });
                 }}
-                className="min-h-[36px] rounded bg-red-600 px-3 text-white disabled:opacity-50"
+                className="ui-btn bg-red-600 px-3 text-xs text-white"
               >
                 불참 저장
               </button>
@@ -306,7 +344,7 @@ export function AttendanceTable({ date, slot, rows }: Props) {
                     setNoteDraft("");
                   });
                 }}
-                className="min-h-[36px] rounded border border-slate-300 px-3 text-slate-700 disabled:opacity-50"
+                className="ui-btn border border-slate-300 bg-white px-3 text-xs text-slate-700"
               >
                 사유만 갱신
               </button>

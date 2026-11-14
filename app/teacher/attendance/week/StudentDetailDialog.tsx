@@ -119,19 +119,20 @@ export function StudentDetailDialog({ studentNo, name, classroom, onClose }: Pro
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 p-0 backdrop-blur-xs sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={`${name} 학생 상세`}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-t-2xl bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl sm:rounded-2xl sm:pb-4"
+        className="w-full max-w-md rounded-t-3xl border border-slate-200/80 bg-white/95 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl backdrop-blur-xl sm:rounded-3xl sm:pb-5"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-slate-200 sm:hidden" />
         <div className="mb-3 flex items-start justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-900">{name}</h2>
+            <h2 className="text-base font-bold text-slate-900">{name}</h2>
             <p className="text-xs text-slate-500">
               <span className="font-mono">{studentNo}</span> · {classroom}
             </p>
@@ -139,7 +140,7 @@ export function StudentDetailDialog({ studentNo, name, classroom, onClose }: Pro
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             aria-label="닫기"
           >
             ✕
@@ -151,7 +152,7 @@ export function StudentDetailDialog({ studentNo, name, classroom, onClose }: Pro
         ) : (
           <div className="space-y-3">
             <label className="block">
-              <span className="mb-1 block text-xs font-medium text-slate-600">연락처</span>
+              <span className="mb-1 block text-xs font-semibold text-slate-700">연락처</span>
               <input
                 type="text"
                 inputMode="tel"
@@ -159,27 +160,27 @@ export function StudentDetailDialog({ studentNo, name, classroom, onClose }: Pro
                 value={contact}
                 onChange={(e) => handleContactChange(e.target.value)}
                 placeholder="예: 010-1234-5678"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="ui-input w-full"
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs font-medium text-slate-600">제출시간</span>
+              <span className="mb-1 block text-xs font-semibold text-slate-700">제출시간</span>
               <input
                 type="text"
                 value={submittedAt}
                 onChange={(e) => setSubmittedAt(e.target.value)}
                 placeholder="예: 2026-08-27 13:22:55"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="ui-input w-full"
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs font-medium text-slate-600">수정시간</span>
+              <span className="mb-1 block text-xs font-semibold text-slate-700">수정시간</span>
               <input
                 type="text"
                 value={updatedAt}
                 onChange={(e) => setUpdatedAt(e.target.value)}
                 placeholder="예: 2026-08-27 13:40:00"
-                className="w-full rounded-md border px-3 py-2 text-sm"
+                className="ui-input w-full"
               />
             </label>
 
@@ -189,12 +190,12 @@ export function StudentDetailDialog({ studentNo, name, classroom, onClose }: Pro
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 
-            <div className="flex justify-end gap-2 pt-1">
+            <div className="grid grid-cols-2 gap-2 pt-2 sm:flex sm:justify-end">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={saving}
-                className="rounded-md border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                className="ui-btn border border-slate-200 bg-white px-4 py-2 text-slate-600 hover:bg-slate-50"
               >
                 취소
               </button>
@@ -202,7 +203,7 @@ export function StudentDetailDialog({ studentNo, name, classroom, onClose }: Pro
                 type="button"
                 onClick={save}
                 disabled={saving}
-                className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+                className="ui-btn bg-slate-900 px-4 py-2 font-semibold text-white hover:bg-slate-800"
               >
                 {saving ? "저장 중…" : "저장"}
               </button>

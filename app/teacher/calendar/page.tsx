@@ -17,11 +17,15 @@ export default async function CalendarPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">캘린더 예외 관리</h1>
-      <p className="text-sm text-slate-600">
-        휴일·시험일 등을 등록하면 이후 Excel 업로드에서 해당 날짜 행은 대상자로 생성되지 않습니다.
-        이미 대상자가 있는 날짜를 등록하면 감사 로그에 기록되고 경고가 표시됩니다.
-      </p>
+      <div className="ui-card p-4">
+        <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+          캘린더 예외 관리
+        </h1>
+        <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+          휴일·시험일 등을 등록하면 이후 Excel 업로드에서 해당 날짜 행은 대상자로 생성되지 않습니다.
+          이미 대상자가 있는 날짜를 등록하면 감사 로그에 기록되고 경고가 표시됩니다.
+        </p>
+      </div>
       <CalendarManager rows={list} />
     </div>
   );

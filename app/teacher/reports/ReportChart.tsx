@@ -37,21 +37,21 @@ export function ReportChart({ series }: { series: SlotSeriesPoint[] }) {
 
   if (data.length === 0) {
     return (
-      <div className="rounded-md border bg-white p-4 text-sm text-slate-500 shadow-sm">
+      <div className="ui-card p-5 text-sm text-slate-500">
         데이터가 없습니다.
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border bg-white p-4 shadow-sm">
-      <h3 className="text-sm font-semibold">슬롯별 참여율 시계열 (%)</h3>
-      <div className="mt-3 h-64 w-full">
+    <div className="ui-card p-4 sm:p-5">
+      <h3 className="text-sm font-bold text-slate-900">슬롯별 참여율 시계열 (%)</h3>
+      <div className="mt-3 h-56 w-full sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" fontSize={12} />
-            <YAxis domain={[0, 100]} fontSize={12} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis dataKey="date" fontSize={11} />
+            <YAxis domain={[0, 100]} fontSize={11} width={32} />
             <Tooltip />
             <Legend />
             {SLOTS.map((s) => (
@@ -61,6 +61,7 @@ export function ReportChart({ series }: { series: SlotSeriesPoint[] }) {
                 dataKey={s}
                 name={SLOT_LABEL[s]}
                 stroke={COLORS[s]}
+                strokeWidth={2}
                 connectNulls
                 dot={{ r: 3 }}
               />

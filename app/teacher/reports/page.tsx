@@ -40,52 +40,57 @@ export default async function ReportsPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <h1 className="text-xl font-semibold">리포트</h1>
-        <div className="flex flex-wrap gap-2 text-sm">
+      <div className="ui-card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">리포트</h1>
+          <p className="mt-0.5 text-xs text-slate-500">
+            기간·슬롯별 출결 통계 및 참여율 시계열 리포트를 확인합니다.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-sm sm:flex sm:flex-wrap">
           <Link
             href={`/teacher/reports/download/csv?${q}` as Route}
             prefetch={false}
-            className="min-h-[40px] flex-1 rounded border border-slate-300 px-3 py-1.5 text-center hover:bg-slate-100 sm:flex-none"
+            className="ui-btn border border-slate-200 bg-white px-3.5 py-2 text-center text-slate-700 hover:bg-slate-50"
           >
             CSV 다운로드
           </Link>
           <Link
             href={`/teacher/reports/download/xlsx?${q}` as Route}
             prefetch={false}
-            className="min-h-[40px] flex-1 rounded bg-slate-900 px-3 py-1.5 text-center text-white sm:flex-none"
+            className="ui-btn bg-gradient-to-r from-slate-900 to-indigo-950 px-3.5 py-2 text-center text-white shadow-sm"
           >
             결과 Excel 다운로드
           </Link>
         </div>
       </div>
 
-      <form className="rounded-md border bg-white p-4 shadow-sm" method="get">
+      <form className="ui-card p-4" method="get">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-          <label className="text-sm">
+          <label className="text-xs font-semibold text-slate-700 sm:text-sm">
             시작일
             <input
               name="from"
               type="date"
               defaultValue={from}
-              className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 py-1"
+              className="ui-input mt-1 block w-full"
             />
           </label>
-          <label className="text-sm">
+          <label className="text-xs font-semibold text-slate-700 sm:text-sm">
             종료일
             <input
               name="to"
               type="date"
               defaultValue={to}
-              className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 py-1"
+              className="ui-input mt-1 block w-full"
             />
           </label>
-          <label className="text-sm">
+          <label className="text-xs font-semibold text-slate-700 sm:text-sm">
             슬롯
             <select
               name="slot"
               defaultValue={slot}
-              className="mt-1 block w-full min-h-[40px] rounded border border-slate-300 px-2 py-1"
+              className="ui-input mt-1 block w-full"
             >
               <option value="ALL">전체</option>
               {SLOT_ORDER.map((s) => (
@@ -98,57 +103,101 @@ export default async function ReportsPage({
           <div className="flex items-end">
             <button
               type="submit"
-              className="w-full min-h-[40px] rounded bg-slate-900 px-3 py-1.5 text-sm text-white"
+              className="ui-btn w-full bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
             >
               적용
             </button>
           </div>
         </div>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2.5 text-xs text-slate-500">
           대상 기간 총 대상자: {totalPlans}건
         </p>
       </form>
 
       <ReportChart series={series} />
 
-      <div className="overflow-x-auto rounded-md border bg-white shadow-sm">
+      {/* 모바일 전용: 학생별 리포트 요약 카드 (가로 스크롤 없이 한눈에 확인) */}
+      <ul className="space-y-2.5 sm:hidden" aria-label="모바일 학생별 리포트">
+        {rows.map((r) => (
+          <li key={r.studentNo} className="ui-card p-3.5">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <span className="text-sm font-bold text-slate-900">{r.name}</span>
+                <span className="ml-2 font-mono text-xs text-slate-500">{r.studentNo}</span>
+                <span className="ml-1.5 text-xs text-slate-500">· {r.classroom}</span>
+              </div>
+              <span className="rounded-lg bg-slate-900 px-2.5 py-0.5 text-xs font-bold text-white">
+                {r.rate === "-" ? "-" : `${r.rate}%`}
+              </span>
+            </div>
+            <div className="mt-2.5 grid grid-cols-6 gap-1 text-center text-[11px]">
+              <div className="rounded-lg bg-slate-50 py-1">
+                <div className="text-slate-400">대상</div>
+                <div className="font-bold text-slate-800">{r.total}</div>
+              </div>
+              <div className="rounded-lg bg-emerald-50/80 py-1">
+                <div className="text-emerald-700">출석</div>
+                <div className="font-bold text-emerald-800">{r.present}</div>
+              </div>
+              <div className="rounded-lg bg-amber-50/80 py-1">
+                <div className="text-amber-700">지각</div>
+                <div className="font-bold text-amber-800">{r.late}</div>
+              </div>
+              <div className="rounded-lg bg-orange-50/80 py-1">
+                <div className="text-orange-700">조퇴</div>
+                <div className="font-bold text-orange-800">{r.leaveEarly}</div>
+              </div>
+              <div className="rounded-lg bg-red-50/80 py-1">
+                <div className="text-red-700">결석</div>
+                <div className="font-bold text-red-800">{r.absent}</div>
+              </div>
+              <div className="rounded-lg bg-sky-50/80 py-1">
+                <div className="text-sky-700">인정</div>
+                <div className="font-bold text-sky-800">{r.excused}</div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="ui-card overflow-x-auto">
         <table className="w-full min-w-[720px] text-sm">
-          <thead className="border-b bg-slate-50 text-left text-xs text-slate-600">
+          <thead className="border-b bg-slate-50/90 text-left text-xs text-slate-600">
             <tr>
-              <th className="px-3 py-2">학번</th>
-              <th className="px-3 py-2">이름</th>
-              <th className="px-3 py-2">반</th>
-              <th className="px-3 py-2 text-right">대상일수</th>
-              <th className="px-3 py-2 text-right">출석</th>
-              <th className="px-3 py-2 text-right">지각</th>
-              <th className="px-3 py-2 text-right">조퇴</th>
-              <th className="px-3 py-2 text-right">결석</th>
-              <th className="px-3 py-2 text-right">인정</th>
-              <th className="px-3 py-2 text-right">미체크</th>
-              <th className="px-3 py-2 text-right">참석률(%)</th>
+              <th className="px-3 py-2.5">학번</th>
+              <th className="px-3 py-2.5">이름</th>
+              <th className="px-3 py-2.5">반</th>
+              <th className="px-3 py-2.5 text-right">대상일수</th>
+              <th className="px-3 py-2.5 text-right">출석</th>
+              <th className="px-3 py-2.5 text-right">지각</th>
+              <th className="px-3 py-2.5 text-right">조퇴</th>
+              <th className="px-3 py-2.5 text-right">결석</th>
+              <th className="px-3 py-2.5 text-right">인정</th>
+              <th className="px-3 py-2.5 text-right">미체크</th>
+              <th className="px-3 py-2.5 text-right">참석률(%)</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-3 py-4 text-center text-slate-500">
+                <td colSpan={11} className="px-3 py-6 text-center text-slate-500">
                   데이터가 없습니다.
                 </td>
               </tr>
             )}
             {rows.map((r) => (
-              <tr key={r.studentNo} className="border-b last:border-b-0">
+              <tr key={r.studentNo} className="border-b last:border-b-0 hover:bg-slate-50/60">
                 <td className="px-3 py-2 font-mono text-xs">{r.studentNo}</td>
-                <td className="px-3 py-2">{r.name}</td>
+                <td className="px-3 py-2 font-medium">{r.name}</td>
                 <td className="px-3 py-2 text-slate-600">{r.classroom}</td>
                 <td className="px-3 py-2 text-right">{r.total}</td>
-                <td className="px-3 py-2 text-right">{r.present}</td>
+                <td className="px-3 py-2 text-right text-emerald-700 font-medium">{r.present}</td>
                 <td className="px-3 py-2 text-right">{r.late}</td>
                 <td className="px-3 py-2 text-right">{r.leaveEarly}</td>
-                <td className="px-3 py-2 text-right">{r.absent}</td>
+                <td className="px-3 py-2 text-right text-red-700 font-medium">{r.absent}</td>
                 <td className="px-3 py-2 text-right">{r.excused}</td>
-                <td className="px-3 py-2 text-right">{r.unchecked}</td>
-                <td className="px-3 py-2 text-right font-medium">
+                <td className="px-3 py-2 text-right text-slate-400">{r.unchecked}</td>
+                <td className="px-3 py-2 text-right font-bold text-slate-900">
                   {r.rate === "-" ? "-" : r.rate}
                 </td>
               </tr>

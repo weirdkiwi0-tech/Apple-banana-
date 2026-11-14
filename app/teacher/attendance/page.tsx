@@ -57,49 +57,51 @@ export default async function AttendancePage({
 
   return (
     <div className="space-y-4">
-      {/* 상단 탭 */}
-      <div className="flex border-b border-slate-200">
+      {/* 상단 세그먼트 탭 (Apple HIG / Material 3 스타일) */}
+      <div className="grid grid-cols-2 rounded-2xl border border-slate-200/80 bg-slate-100/80 p-1 backdrop-blur-sm sm:inline-flex sm:w-auto">
         <Link
           href={`/teacher/attendance/week?monday=${weekMonday}` as Route}
-          className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800"
+          className="rounded-xl px-4 py-2 text-center text-sm font-medium text-slate-600 transition hover:text-slate-900"
         >
           주간 출결 (엑셀 양식)
         </Link>
         <Link
           href={`/teacher/attendance?date=${date}&slot=${slot}` as Route}
-          className="border-b-2 border-slate-900 px-4 py-2 text-sm font-bold text-slate-900"
+          className="rounded-xl bg-white px-4 py-2 text-center text-sm font-bold text-slate-900 shadow-sm transition"
         >
           일일 출결 (상세)
         </Link>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="ui-card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold">일일 출결 체크</h1>
+          <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+            일일 출결 체크
+          </h1>
           <p className="mt-0.5 text-xs text-slate-500">
-            {date} · {SLOT_LABEL[slot]} (신청 {rows.length}명) · 전체 학생 주간 표는 [주간 출결 (엑셀 양식)] 탭을 확인하세요.
+            {date} · {SLOT_LABEL[slot]} (신청 <span className="font-semibold text-slate-700">{rows.length}명</span>) · 전체 학생 주간 표는 [주간 출결 (엑셀 양식)] 탭을 확인하세요.
           </p>
         </div>
         <form className="flex flex-wrap items-center gap-2 text-sm" method="get">
-          <label htmlFor="date" className="text-slate-600">날짜</label>
+          <label htmlFor="date" className="text-xs font-medium text-slate-600 sm:text-sm">날짜</label>
           <input
             id="date"
             name="date"
             type="date"
             defaultValue={date}
-            className="min-h-[40px] flex-1 rounded border border-slate-300 px-2 py-1 sm:flex-none"
+            className="ui-input flex-1 sm:flex-none"
           />
           <input type="hidden" name="slot" value={slot} />
           <button
             type="submit"
-            className="min-h-[40px] rounded bg-slate-900 px-3 py-1 text-white"
+            className="ui-btn bg-slate-900 px-4 text-white hover:bg-slate-800"
           >
             이동
           </button>
         </form>
       </div>
 
-      <div className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         {SLOT_ORDER.map((s) => {
           const href = `/teacher/attendance?date=${date}&slot=${s}` as Route;
           const active = s === slot;
@@ -107,10 +109,10 @@ export default async function AttendancePage({
             <Link
               key={s}
               href={href}
-              className={`min-h-[40px] shrink-0 rounded border px-3 py-1.5 text-sm ${
+              className={`ui-btn px-3 py-2 text-center text-xs sm:text-sm ${
                 active
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                  ? "bg-gradient-to-r from-slate-900 to-indigo-950 font-semibold text-white shadow-sm"
+                  : "border border-slate-200/90 bg-white/90 text-slate-700 hover:bg-slate-100"
               }`}
             >
               {SLOT_LABEL[s]} ({countMap.get(s) ?? 0})

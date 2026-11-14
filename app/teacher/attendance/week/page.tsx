@@ -62,51 +62,53 @@ export default async function WeekPage({
 
   return (
     <div className="space-y-4">
-      {/* 상단 탭 */}
-      <div className="flex border-b border-slate-200">
+      {/* 상단 세그먼트 탭 (Apple HIG / Material 3 스타일) */}
+      <div className="grid grid-cols-2 rounded-2xl border border-slate-200/80 bg-slate-100/80 p-1 backdrop-blur-sm sm:inline-flex sm:w-auto">
         <Link
           href={`/teacher/attendance/week?monday=${monday}` as Route}
-          className="border-b-2 border-slate-900 px-4 py-2 text-sm font-bold text-slate-900"
+          className="rounded-xl bg-white px-4 py-2 text-center text-sm font-bold text-slate-900 shadow-sm transition"
         >
           주간 출결 (엑셀 양식)
         </Link>
         <Link
           href={`/teacher/attendance?date=${dates[0]}&slot=OJA` as Route}
-          className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800"
+          className="rounded-xl px-4 py-2 text-center text-sm font-medium text-slate-600 transition hover:text-slate-900"
         >
           일일 출결 (상세)
         </Link>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="ui-card flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold">주간 출결표 (엑셀 양식)</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
-            {monday} ~ {friday} · 총 {allStudents.length}명 등록
+          <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+            주간 출결표 (엑셀 양식)
+          </h1>
+          <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+            {monday} ~ {friday} · 총 <span className="font-semibold text-slate-700">{allStudents.length}명</span> 등록
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-sm">
+        <div className="grid grid-cols-3 gap-1.5 text-xs sm:flex sm:flex-wrap sm:items-center sm:gap-2 sm:text-sm">
           <Link
             href={`/teacher/attendance/week?monday=${prevMonday}` as Route}
-            className="min-h-[40px] rounded border border-slate-300 bg-white px-3 py-1.5 hover:bg-slate-100"
+            className="ui-btn border border-slate-200 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50"
           >
             ← 이전 주
           </Link>
           <Link
             href={`/teacher/attendance/week?monday=${thisMonday}` as Route}
-            className="min-h-[40px] rounded border border-slate-300 bg-white px-3 py-1.5 hover:bg-slate-100"
+            className="ui-btn border border-slate-200 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50"
           >
             이번 주
           </Link>
           <Link
             href={`/teacher/attendance/week?monday=${nextMonday}` as Route}
-            className="min-h-[40px] rounded border border-slate-300 bg-white px-3 py-1.5 hover:bg-slate-100"
+            className="ui-btn border border-slate-200 bg-white px-2.5 py-2 text-slate-700 hover:bg-slate-50"
           >
             다음 주 →
           </Link>
           <a
             href={`/teacher/attendance/week/download/xlsx?monday=${monday}`}
-            className="min-h-[40px] rounded bg-emerald-700 px-3 py-1.5 font-medium text-white hover:bg-emerald-800"
+            className="ui-btn col-span-3 bg-gradient-to-r from-emerald-600 to-teal-600 px-3.5 py-2 font-semibold text-white shadow-sm hover:from-emerald-700 hover:to-teal-700 sm:col-span-1"
           >
             엑셀 내려받기
           </a>
