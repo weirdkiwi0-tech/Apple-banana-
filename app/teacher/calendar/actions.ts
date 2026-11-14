@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireTeacher } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatKstDate, parseKstDateString } from "@/lib/date";
 
@@ -18,6 +19,7 @@ export interface CalendarActionResult {
 }
 
 export async function addExceptionAction(formData: FormData): Promise<CalendarActionResult> {
+  await requireTeacher();
   const parsed = AddSchema.safeParse({
     date: formData.get("date"),
     reason: formData.get("reason"),
@@ -65,6 +67,7 @@ export async function addExceptionAction(formData: FormData): Promise<CalendarAc
 }
 
 export async function deleteExceptionAction(formData: FormData): Promise<CalendarActionResult> {
+  await requireTeacher();
   const id = formData.get("id");
   if (typeof id !== "string" || !id) {
     return { ok: false, message: "잘못된 요청입니다." };

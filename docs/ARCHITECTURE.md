@@ -3,7 +3,7 @@
 본 문서는 [IDEATION.md](./IDEATION.md)의 결정 사항을 전제로 한다. 상세 요구사항과 인수 조건은 [PRD.md](./PRD.md) 참조.
 
 ## 개요
-- 단일 코드베이스로 서버·API·클라이언트를 제공하며, 최종 배포 플랫폼(PWA 또는 Android 앱)은 보류.
+- 단일 코드베이스로 서버·API·PWA 클라이언트를 제공하며, 초기 배포는 Vercel을 사용한다.
 - 담당 교사 1명이 휴대폰(Chrome)에서 사용.
 - 학생·보호자는 사용자 아님.
 
@@ -15,7 +15,7 @@
 - **패키지 매니저**: pnpm.
 
 ### 웹 프레임워크
-- **Next.js 15+ (App Router)**: UI·서버 액션·API를 단일 코드베이스에서 제공. PWA 또는 Android 앱 선택은 별도 결정.
+- **Next.js 15+ (App Router)**: UI·서버 액션·API를 단일 코드베이스에서 제공.
 - 폼 처리는 서버 액션 + zod 검증으로 통일.
 
 ### UI
@@ -28,13 +28,14 @@
 - **zod**: 서버 액션 입력 스키마. 클라이언트·서버 공용.
 
 ### 인증/세션
-- **iron-session**: HTTP-only 서명 쿠키(`SameSite=Lax`), 서버 액션 가드에 적합.
-- 인증 SaaS(NextAuth/Clerk 등)는 단일 패스코드 방침에 과함 — 도입하지 않음.
+- 교사 단일 패스코드와 HMAC 서명 HTTP-only 쿠키(`SameSite=Lax`)를 사용한다.
+- `/teacher/**`는 middleware로 보호하고 서버 액션·다운로드 라우트에서도 세션을 검증한다.
+- 패스코드와 서명 키는 환경변수로 관리한다.
 
 ### 데이터
 - **Prisma**: TypeScript 우선 ORM, SQLite→Postgres 이전 경로 자연스러움.
-- **DB (MVP)**: SQLite 파일 (`file:./data/app.db`), 단일 인스턴스 전제.
-- **DB (확장)**: PostgreSQL 16+ (학교 승인 후 이전 시).
+- **DB (로컬·테스트)**: SQLite 파일 (`file:./data/app.db`).
+- **DB (Vercel 배포)**: Neon PostgreSQL; 마이그레이션은 Prisma migrate로 적용한다.
 
 ### 유틸
 - **Excel**: xlsx (Excel 읽기·쓰기). CSV는 보조 입력 형식으로만 지원.
@@ -42,9 +43,9 @@
 - **차트**: recharts.
 - **로깅**: pino (JSON 로그, 최소 필드). 서버 로그는 stdout, 접속 로그는 시각·액션·actor만.
 
-### 플랫폼 선택 (보류)
-- **PWA 후보**: Web App Manifest와 서비스워커를 사용해 브라우저 설치형으로 제공.
-- **Android 앱 후보**: 동일 서비스에 연결하는 앱 패키지 방식 검토.
+### 플랫폼 선택
+- **PWA**: Web App Manifest와 서비스워커를 사용해 브라우저 설치형으로 제공.
+- **Android 앱**: 후속 검토 대상으로 두며 MVP 배포에는 포함하지 않는다.
 - 업무 규칙과 Excel 입출력은 플랫폼과 독립적으로 설계한다.
 
 ### 테스트
@@ -57,9 +58,9 @@
 - **Docker + docker-compose**: 학교 내부망 배포 및 로컬 재현.
 
 ## 스택 선정 이유
-- 교사 1명·학생 30명 규모에는 단일 Node 프로세스 + SQLite로 충분.
+- 로컬·테스트는 SQLite, Vercel 서버리스 운영은 공유 가능한 PostgreSQL로 구분한다.
 - Next.js 서버 액션이 CSRF 보호와 zod 검증을 자연스럽게 결합 → 개인정보 화이트리스트 강제에 유리.
-- Prisma로 SQLite↔Postgres 이전이 문서화된 경로 → 배포 위치 결정(OQ-2) 지연을 흡수.
+- Prisma로 SQLite 로컬 스키마와 PostgreSQL 배포 스키마를 함께 관리한다.
 - TypeScript strict + zod로 컴파일·런타임 이중 검증 → 데이터 보호 원칙(PRD §6 P-1) 준수 감사에 활용.
 - 전 항목이 무료·오픈소스 → 학교 예산 부담 없음.
 
@@ -68,11 +69,11 @@
 - 별도 프론트/백엔드 분리, GraphQL 계층 — 서버 액션으로 충분.
 
 ## 배포 토폴로지
-- **A안 (MVP 1순위)**: 학교 내부망 상시 서버에 Docker 컨테이너로 배포, HTTPS/방화벽 설정.
-- **B안 (조건부)**: 학교가 개인정보 위탁·국외 이전 여부·안전조치를 검토·승인한 뒤 승인된 클라우드 호스팅.
-- **C안 (미채택)**: 교실 PC 로컬 실행 — 휴대폰 접속 요건과 충돌.
+- **초기 배포**: Vercel HTTPS PWA + Neon PostgreSQL.
+- 실제 학생 정보 처리는 학교가 외부 클라우드·개인정보 처리 방식을 검토·승인한 뒤에만 허용한다.
+- Vercel 배포 전 `DATABASE_URL`, `DIRECT_URL`, `TEACHER_PASSCODE`, `SESSION_SECRET`을 환경변수로 설정한다.
 
-배포 위치가 확정되기 전에는 실제 학생 정보를 투입하지 않는다.
+학교 승인이 완료되기 전에는 실제 학생 정보를 투입하지 않는다.
 
 ## 접근 통제
 - 학생 로그인 없음.
@@ -126,9 +127,9 @@ enum CalendarReason  { HOLIDAY EXAM OTHER }
 - **불참 사유**: 교사가 직접 작성할 수 있으나 건강정보·질병명·가정사 등 민감한 상세 내용은 입력하지 않음.
 - **감사 로그**: 상태 전이·삭제 없음. 명부는 비활성화만 지원.
 
-## 플랫폼별 운영 전략 (결정 보류)
-- PWA를 선택하면 `manifest.json`과 서비스워커를 사용하고, 출결 API는 network-first로 운영한다.
-- Android 앱을 선택하면 동일한 서버와 데이터 규칙을 사용하는 앱 배포 방식을 별도 검토한다.
+## 플랫폼별 운영 전략
+- PWA의 매니페스트와 서비스워커를 사용하고, 출결 API는 network-first로 운영한다.
+- Android 앱은 동일 서버와 데이터 규칙을 사용하는 후속 선택지다.
 - 오프라인 출결 저장은 어느 플랫폼에서도 MVP 범위가 아니다.
 
 ## 알림
@@ -136,7 +137,8 @@ enum CalendarReason  { HOLIDAY EXAM OTHER }
 - 후속: 카카오 알림톡 — 공식 딜러사 계약, 학교 명의 비즈니스 채널, 승인 템플릿, 수신자 처리 근거 확보 시 도입.
 
 ## 환경 변수
-- `DATABASE_URL` (예: `file:./data/app.db`)
+- `DATABASE_URL` (로컬 SQLite 또는 Neon pooled PostgreSQL URL)
+- `DIRECT_URL` (Neon direct/unpooled PostgreSQL URL, 마이그레이션용)
 - `TEACHER_PASSCODE` (최소 12자)
 - `SESSION_SECRET` (쿠키 서명용, 최소 32자)
 - `SESSION_HOURS` (기본 12)
@@ -159,20 +161,19 @@ enum CalendarReason  { HOLIDAY EXAM OTHER }
 - `public/{manifest.json,icons/*}`
 
 ## 백업/복구
-- 매일 1회 SQLite 파일 스냅샷, 최근 7일 보관.
+- PostgreSQL 공급자의 백업·시점 복구 기능을 사용하고 학교 보존 기간에 맞춰 보관 정책을 확정한다.
 - 학년도 종료 + 정해진 보존 기간 후 파기 스크립트 실행(스케줄 확정은 학교 기준 확보 후).
 
-## 확장 여지 (구현 대상 아님)
+## 확장 여지
 - **Android 앱**: 동일 서버 URL을 Capacitor로 감싸는 방식. Play Store 배포 시 데이터 보안 양식·개인정보처리방침 필요.
-- **Postgres 이전**: `DATABASE_URL` 변경 + `prisma migrate deploy`.
 - **오프라인 큐**: IndexedDB에 미전송 출결 저장 후 재접속 시 재전송.
 
 ## 운영 결정 및 후속 확장
-- **MVP 운영 모델**: 학교 공식 출결을 대체하지 않는 야자 운영 보조 도구. 교사 휴대폰이 주 기기이며 학교 내부망의 상시 서버에 접속한다. 최종 플랫폼은 보류.
+- **MVP 운영 모델**: 학교 공식 출결을 대체하지 않는 야자 운영 보조 도구. 교사 휴대폰에서 PWA로 Vercel에 접속한다. 실제 학생 정보 입력은 학교의 외부 클라우드 사용 승인을 전제로 한다.
 - **MVP 입력 모델**: 선생님들이 작성한 Excel을 업로드해 학생·날짜·슬롯별 `ParticipationPlan`을 생성하고, 출결 결과가 포함된 Excel을 다운로드.
 - **MVP 출결 모델**: Excel에 등록된 학생만 출결 대상에 포함. 미체크는 결석으로 자동 확정하지 않으며, 교사가 최종 상태를 기록.
 - **MVP 데이터 정책**: 건강정보·증빙자료·보호자 연락처를 저장하지 않음. 학생 연락처와 설문 제출/수정시간은 교사용 내부 상세로만 저장하고 결과 Excel·CSV·감사 로그·외부 공유에서 제외한다. 불참 사유는 제한된 길이의 교사 입력으로 저장하되 민감한 상세 내용을 입력하지 않는다. 데이터는 학년도 단위 보관을 임시 기준으로 두고 학교 기준 확정 후 갱신.
-- **후속 확장**: 교외 접속, 학생 신청, 교사별 계정·역할, 푸시·QR, 카카오 알림톡, 좌석·다중 반, NEIS 연동. 플랫폼 결정 후 PWA 또는 Android 배포를 진행한다.
+- **후속 확장**: 교외 접속, 학생 신청, 교사별 계정·역할, 푸시·QR, 카카오 알림톡, 좌석·다중 반, NEIS 연동, Android 앱.
 
 ## Excel 재업로드 정책
 - 업로드는 기존 데이터의 전체 교체가 아니라 유효한 대상자의 추가·확인 작업이다.
@@ -186,4 +187,4 @@ enum CalendarReason  { HOLIDAY EXAM OTHER }
 - 데이터 보유·파기 기간 및 백업 보관 기준.
 - 실제 슬롯 시간표와 지각·조퇴 판정 기준.
 - 향후 공식 출결 자료로 전환할 가능성과 필요한 권한·정정 절차.
-- 최종 배포 플랫폼을 PWA 또는 Android 앱 중 무엇으로 할지.
+- 학교의 외부 클라우드 사용 및 학생 개인정보 처리 승인 여부.

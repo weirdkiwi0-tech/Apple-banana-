@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
+import { hasTeacherSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
   formatKstDate,
@@ -18,6 +19,9 @@ import {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function GET(request: Request) {
+  if (!(await hasTeacherSession())) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   const url = new URL(request.url);
   const mParam = url.searchParams.get("monday");
   const base = mParam && DATE_RE.test(mParam) ? mParam : kstTodayString();

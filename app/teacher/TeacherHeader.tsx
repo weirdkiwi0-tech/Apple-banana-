@@ -5,6 +5,7 @@ import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { logoutAction } from "./login/actions";
 
 const NAV: Array<{ href: Route; label: string }> = [
   { href: "/teacher/attendance/week", label: "주간 출결 (엑셀)" },
@@ -42,6 +43,8 @@ export function TeacherHeader() {
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  if (pathname === "/teacher/login") return null;
 
   return (
     <header className="sticky top-0 z-20 border-b bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
@@ -92,6 +95,14 @@ export function TeacherHeader() {
                 </Link>
               );
             })}
+            <form action={logoutAction} className="border-t border-slate-200">
+              <button
+                type="submit"
+                className="block w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50"
+              >
+                로그아웃
+              </button>
+            </form>
           </nav>
         )}
       </div>

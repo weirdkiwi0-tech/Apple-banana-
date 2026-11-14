@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 // T-3.1 UI: 슬롯 시간을 저장하면 성공 메시지가 표시된다.
 test("야자 슬롯 시간 저장", async ({ page }) => {

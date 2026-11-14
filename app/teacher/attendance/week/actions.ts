@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireTeacher } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { parseKstDateString } from "@/lib/date";
 import { nextCellState } from "@/lib/weekly-attendance";
@@ -52,6 +53,7 @@ export interface CycleCellInput {
 // 주간 표의 셀 클릭: 현재 상태를 다음 상태로 순환시키고 저장한다.
 // 계획이 없는 빈칸을 클릭하면 즉시 현장 참여(PRESENT)로 신규 등록한다.
 export async function cycleCellAction(input: CycleCellInput) {
+  await requireTeacher();
   if (input.planId) {
     const plan = await prisma.participationPlan.findUnique({
       where: { id: input.planId },
@@ -147,6 +149,7 @@ export interface StudentDetail {
 export async function getStudentDetailAction(
   studentNo: string,
 ): Promise<StudentDetail | null> {
+  await requireTeacher();
   const s = await prisma.student.findUnique({
     where: { studentNo },
     select: {
@@ -182,6 +185,7 @@ export async function updateStudentDetailAction(input: {
   surveySubmittedAt?: string;
   surveyUpdatedAt?: string;
 }): Promise<{ ok: boolean; message?: string }> {
+  await requireTeacher();
   const parsed = StudentDetailSchema.parse(input);
   const student = await prisma.student.findUnique({
     where: { studentNo: parsed.studentNo },

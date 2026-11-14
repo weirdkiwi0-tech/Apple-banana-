@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 // T-3.4 UI: 예외일을 등록하면 목록에 남고(새로고침 후에도) 성공 메시지가 뜬다.
 test("캘린더 예외일 등록 후 지속", async ({ page }) => {

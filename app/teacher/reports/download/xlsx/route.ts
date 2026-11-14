@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
+import { hasTeacherSession } from "@/lib/auth";
 import { STATE_LABEL, SLOT_LABEL, SLOT_ORDER } from "@/lib/slot";
 import { loadDetailedRows, type ReportFilter } from "../../report-data";
 import type { StudySlot } from "@prisma/client";
@@ -19,6 +20,9 @@ function readFilter(url: URL): ReportFilter | null {
 }
 
 export async function GET(request: Request) {
+  if (!(await hasTeacherSession())) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   const filter = readFilter(new URL(request.url));
   if (!filter) {
     return NextResponse.json({ error: "invalid filter" }, { status: 400 });

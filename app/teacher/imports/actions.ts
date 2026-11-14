@@ -2,6 +2,7 @@
 
 import * as XLSX from "xlsx";
 import { revalidatePath } from "next/cache";
+import { requireTeacher } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
   formatKstDate,
@@ -159,6 +160,7 @@ async function importSurvey(
 }
 
 export async function uploadExcelAction(formData: FormData): Promise<ImportResult> {
+  await requireTeacher();
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
     return failResult("파일을 선택하세요.");
