@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import * as XLSX from "xlsx";
 
 // 미래 날짜로 격리 → now < 슬롯 시작 → 입실 시 PRESENT(출석) 판정.

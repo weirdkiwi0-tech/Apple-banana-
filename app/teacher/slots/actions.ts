@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireTeacher } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -31,6 +32,7 @@ function toMinutes(hhmm: string): number {
 }
 
 export async function updateSlotAction(formData: FormData): Promise<SlotUpdateResult> {
+  await requireTeacher();
   const raw = {
     slot: formData.get("slot"),
     startTime: formData.get("startTime"),

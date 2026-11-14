@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 // 각 교사 화면이 서버에서 정상 렌더되는지 확인하는 스모크 (라우팅 + SSR + DB 접근).
 const PAGES: Array<{ path: string; text: string | RegExp }> = [

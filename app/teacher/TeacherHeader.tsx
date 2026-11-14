@@ -15,6 +15,7 @@ import {
   CalendarOff,
   History,
 } from "lucide-react";
+import { logoutAction } from "./login/actions";
 
 const NAV: Array<{
   href: Route;
@@ -94,6 +95,8 @@ export function TeacherHeader() {
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  if (pathname === "/teacher/login") return null;
 
   return (
     <>
@@ -176,6 +179,14 @@ export function TeacherHeader() {
                   </Link>
                 );
               })}
+              <form action={logoutAction} className="mt-1 border-t border-slate-200">
+                <button
+                  type="submit"
+                  className="block min-h-[40px] w-full rounded-xl px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-100/80"
+                >
+                  로그아웃
+                </button>
+              </form>
             </nav>
           )}
         </div>

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireTeacher } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { classifyCheckIn, classifyCheckOut } from "@/lib/attendance-logic";
 import type { StudySlot } from "@prisma/client";
@@ -62,6 +63,7 @@ export async function checkInAction(input: {
   date: string;
   slot: StudySlot;
 }) {
+  await requireTeacher();
   const parsed = CheckInSchema.parse(input);
   const plan = await loadPlanOrThrow(parsed.planId);
   const window = await loadSlotWindow(parsed.date, parsed.slot);
@@ -87,6 +89,7 @@ export async function checkOutAction(input: {
   date: string;
   slot: StudySlot;
 }) {
+  await requireTeacher();
   const parsed = CheckInSchema.parse(input);
   const plan = await loadPlanOrThrow(parsed.planId);
   const window = await loadSlotWindow(parsed.date, parsed.slot);
@@ -117,6 +120,7 @@ export async function markAbsentAction(input: {
   planId: string;
   note?: string;
 }) {
+  await requireTeacher();
   const parsed = AbsenceSchema.parse(input);
   const plan = await loadPlanOrThrow(parsed.planId);
   const beforeState = plan.attendance?.state ?? "UNCHECKED";
@@ -139,6 +143,7 @@ export async function markExcusedAction(input: {
   planId: string;
   note?: string;
 }) {
+  await requireTeacher();
   const parsed = AbsenceSchema.parse(input);
   const plan = await loadPlanOrThrow(parsed.planId);
   const beforeState = plan.attendance?.state ?? "UNCHECKED";
@@ -158,6 +163,7 @@ export async function markExcusedAction(input: {
 }
 
 export async function resetAction(input: { planId: string }) {
+  await requireTeacher();
   const plan = await loadPlanOrThrow(input.planId);
   const beforeState = plan.attendance?.state ?? "UNCHECKED";
   await prisma.attendance.update({
@@ -178,6 +184,7 @@ export async function updateAbsenceNoteAction(input: {
   planId: string;
   note: string;
 }) {
+  await requireTeacher();
   const parsed = z
     .object({ planId: z.string().min(1), note: z.string().max(200) })
     .parse(input);

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { hasTeacherSession } from "@/lib/auth";
 import { loadReport, type ReportFilter } from "../../report-data";
 import type { StudySlot } from "@prisma/client";
 
@@ -23,6 +24,9 @@ function csvEscape(v: string | number): string {
 }
 
 export async function GET(request: Request) {
+  if (!(await hasTeacherSession())) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   const filter = readFilter(new URL(request.url));
   if (!filter) {
     return NextResponse.json({ error: "invalid filter" }, { status: 400 });

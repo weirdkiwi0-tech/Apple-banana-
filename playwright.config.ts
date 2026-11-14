@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { E2E_SESSION_SECRET, E2E_TEACHER_PASSCODE } from "./tests/e2e/constants";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -42,6 +43,9 @@ export default defineConfig({
         env: {
           TZ: "Asia/Seoul",
           DATABASE_URL: "file:./data/e2e.db",
+          TEACHER_PASSCODE: E2E_TEACHER_PASSCODE,
+          SESSION_SECRET: E2E_SESSION_SECRET,
+          SESSION_HOURS: "12",
         },
       },
 });

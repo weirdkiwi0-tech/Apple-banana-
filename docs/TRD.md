@@ -2,7 +2,7 @@
 
 - 관련 문서: [PRD.md](./PRD.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [IDEATION.md](./IDEATION.md)
 - 문서 상태: MVP 기술 요구사항 초안
-- 최종 배포 플랫폼: PWA 또는 Android 앱 중 보류
+- 배포 플랫폼: PWA (Vercel)
 
 ## 1. 기술 목표
 
@@ -28,8 +28,8 @@ Excel 업로드
 - UI: Tailwind CSS, shadcn/ui, lucide-react
 - 폼·검증: react-hook-form, zod
 - ORM: Prisma
-- MVP 데이터베이스: 단일 인스턴스 SQLite
-- 확장 데이터베이스: 학교 승인 후 PostgreSQL 검토
+- 로컬·테스트 데이터베이스: SQLite
+- Vercel 배포 데이터베이스: Neon PostgreSQL
 - Excel 처리: xlsx
 - 날짜 처리: date-fns와 `Asia/Seoul` 기준 유틸리티
 - 리포트: recharts
@@ -48,11 +48,9 @@ Excel 업로드
 
 ### 3.2 플랫폼 정책
 
-- PWA와 Android 앱 중 최종 플랫폼은 보류한다.
+- PWA를 초기 배포 플랫폼으로 사용한다.
 - 업무 규칙, Excel 입출력, 서버 API, 데이터 모델은 플랫폼 독립적으로 설계한다.
-- PWA를 선택하면 Web App Manifest와 서비스워커를 추가한다.
-- Android 앱을 선택하면 동일 서버와 데이터 규칙에 연결하는 앱 패키지 방식을 별도 결정한다.
-- 최종 플랫폼 결정 전 특정 플랫폼의 배포를 MVP 완료 조건으로 삼지 않는다.
+- Android 앱은 후속 검토 대상으로 두며 MVP 배포에 포함하지 않는다.
 - 어느 플랫폼에서도 MVP 오프라인 출결 저장은 지원하지 않는다.
 
 ## 4. 인증과 접근 통제
@@ -60,7 +58,8 @@ Excel 업로드
 - 학생 로그인과 보호자 계정은 제공하지 않는다.
 - 교사 인증은 단일 패스코드 세션을 사용한다.
 - 보호 대상 경로는 `/teacher/**`이며 로그인 경로는 예외로 둔다.
-- 세션 쿠키는 HTTP-only, `SameSite=Lax`를 사용한다.
+- middleware, 서버 액션, 다운로드 라우트에서 서명 세션 쿠키를 검증한다.
+- 세션 쿠키는 HTTP-only, `SameSite=Lax`, 프로덕션 `Secure`를 사용한다.
 - 세션 기본 유효시간은 12시간이다.
 - 패스코드와 세션 서명 키는 환경변수로만 관리한다.
 - 모든 서버 액션과 API 쓰기 요청은 인증 가드를 거친다.
@@ -172,7 +171,7 @@ Excel 업로드
 - 20~40명 규모의 출결 화면에서 일반적인 액션은 로컬 네트워크 기준 500ms 이내에 사용자에게 반응을 표시한다.
 - 저장 실패 시 낙관적 UI를 원상 복구하고 재시도 안내를 표시한다.
 - 네트워크가 끊긴 상태에서는 출결 저장을 완료로 표시하지 않는다.
-- SQLite 백업은 매일 1회 수행하고 최근 7일을 보관하는 방안을 기본으로 검토한다.
+- PostgreSQL 공급자의 백업·시점 복구 기능을 사용하고 학교 보존 기간에 맞춰 보관 정책을 확정한다.
 - 복구 테스트는 월 1회 수행하는 방안을 기본으로 검토한다.
 - 데이터베이스 오류와 Excel 처리 오류는 사용자에게 이해 가능한 메시지로 표시하고 서버 로그에는 원인을 남긴다.
 
@@ -210,11 +209,13 @@ Excel 업로드
 - 결과 Excel 다운로드
 - 주간·월간 리포트 확인
 - 네트워크 실패 안내 확인
-- 최종 플랫폼 결정 전 특정 플랫폼 배포 테스트가 실행되지 않음
+- 로그인 전 `/teacher/**` 접근 시 로그인 페이지로 이동하고 데이터 변경·다운로드가 거부됨
+- Vercel production build에서 Neon PostgreSQL migration과 기본 슬롯 seed가 성공함
 
 ## 13. 환경 변수
 
 - `DATABASE_URL`
+- `DIRECT_URL` (Neon direct/unpooled connection string)
 - `TEACHER_PASSCODE`
 - `SESSION_SECRET`
 - `SESSION_HOURS`
@@ -231,5 +232,5 @@ Excel 업로드
 - 불참 사유 최대 글자 수와 결과 Excel 보관·공유 기준
 - Excel 실제 파일 형식, 열 이름, 시트 구성
 - Excel 결과 파일의 기존 업무 사용 방식
-- PWA와 Android 앱 중 최종 배포 플랫폼
+- 학교의 외부 클라우드·개인정보 처리 승인
 - 공식 출결 전환 가능성과 필요한 권한·정정 절차
